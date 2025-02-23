@@ -1,3 +1,4 @@
+// src/services/countryService.js
 import { feature } from 'topojson-client';
 
 export const getCountryData = async () => {
@@ -7,6 +8,17 @@ export const getCountryData = async () => {
     return feature(topology, topology.objects.countries).features;
   } catch (error) {
     console.error('Error loading country data:', error);
+    return [];
+  }
+};
+
+export const getAdminBoundaryData = async () => {
+  try {
+    const response = await fetch('/simplified-boundaries.json');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error loading admin boundary data:', error);
     return [];
   }
 };
