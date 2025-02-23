@@ -1,7 +1,6 @@
 // src/store/borderHopperStore.js
 import { create } from 'zustand';
 import { getCountryData } from '../services/countryService';
-import { getOfficialName, getCommonName } from '../utils/countryNames';
 
 const findPath = (source, target, borders) => {
   const queue = [[source]];
@@ -38,15 +37,7 @@ const generateGamePair = (borders) => {
     
     const path = findPath(source, target, borders);
     if (path && path.length >= 2 && path.length <= 5) {
-      // Convert to common names for display
-      return { 
-        source: getCommonName(source),
-        target: getCommonName(target),
-        // Keep the official names for internal use
-        officialSource: source,
-        officialTarget: target,
-        path 
-      };
+      return { source, target, path };
     }
   }
   
@@ -111,43 +102,42 @@ const useBorderHopperStore = create((set, get) => ({
     }
   },
 
-
   makeMove: (country) => {
     const { currentPath, targetCountry, borders } = get();
     const currentCountry = currentPath[currentPath.length - 1];
     
-    // Normalize both the entered country and current country names
-    const normalizedCountry = getOfficialName(country);
-    const normalizedCurrent = getOfficialName(currentCountry);
+    const validMoves = borders[currentCountry] || [];
+    console.log('Making move:', {
+      from: currentCountry,
+      to: country,
+      validMoves
+    });
     
-    // Get valid neighbors and normalize them
-    const validMoves = borders[normalizedCurrent] || [];
-    
-    // Check if the normalized country name is in the valid moves
-    if (!validMoves.includes(normalizedCountry)) {
+    if (!validMoves.includes(country)) {
       return { 
         valid: false, 
         message: 'Selected country is not a neighbor' 
       };
     }
 
-    const isWin = normalizedCountry === getOfficialName(targetCountry);
+    const isWin = country === targetCountry;
     
     set({
-      currentPath: [...currentPath, normalizedCountry]
+      currentPath: [...currentPath, country],
+      visitedCountries: new Set([...get().visitedCountries, country])
     });
 
     return {
       valid: true,
       won: isWin,
-      message: isWin ? 'Congratulations! You found a path!' : null
+      message: isWin ? 'Congratulations!' : null
     };
   },
 
   getValidMoves: () => {
     const { currentPath, borders } = get();
     if (!borders || currentPath.length === 0) return [];
-    const currentCountry = getOfficialName(currentPath[currentPath.length - 1]);
+    const currentCountry = currentPath[currentPath.length - 1];
     return borders[currentCountry] || [];
   }
 }));

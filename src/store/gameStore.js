@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { getCountryData } from '../services/countryService';
-import { calculateDistance, getDirection } from '../services/gameService';
+import { calculateDistance, getDirection } from '../services/classicGameService';
 
 const getCenterCoordinates = (geometry) => {
   if (!geometry?.coordinates) return null;

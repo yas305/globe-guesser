@@ -1,18 +1,13 @@
+// src/components/borderHopper/autocomplete.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import useBorderHopperStore from '../../store/borderHopperStore';
-import { getCommonName, getOfficialName } from '../../utils/countryNames';
-
-// Placeholder for all countries (replace with your data source)
-const allCountries = [
-    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", // ... more countries
-    "United States", "United Kingdom", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
-];
 
 const BorderHopperAutocomplete = ({ onSelect }) => {
     const [input, setInput] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef(null);
+    const validMoves = useBorderHopperStore(state => state.getValidMoves());
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -27,11 +22,10 @@ const BorderHopperAutocomplete = ({ onSelect }) => {
     const handleChange = (e) => {
         const value = e.target.value;
         setInput(value);
-
+        
         if (value.length > 0) {
-            const filtered = allCountries.filter(country =>
-                getCommonName(country).toLowerCase().startsWith(value.toLowerCase()) ||
-                country.toLowerCase().startsWith(value.toLowerCase())
+            const filtered = validMoves.filter(country => 
+                country.toLowerCase().includes(value.toLowerCase())
             );
             setSuggestions(filtered);
             setIsOpen(true);
@@ -42,8 +36,7 @@ const BorderHopperAutocomplete = ({ onSelect }) => {
     };
 
     const handleSelect = (value) => {
-        const officialName = getOfficialName(value);
-        onSelect?.(officialName);
+        onSelect?.(value);
         setInput('');
         setSuggestions([]);
         setIsOpen(false);
@@ -56,13 +49,13 @@ const BorderHopperAutocomplete = ({ onSelect }) => {
                     type="text"
                     value={input}
                     onChange={handleChange}
-                    placeholder="Enter a country name..."
+                    placeholder="Enter your guess..."
                     className="w-full px-4 py-3 rounded-l-lg border-0 outline-none"
                 />
                 <button 
                     onClick={() => handleSelect(input)}
                     className="px-6 py-3 bg-blue-500 hover:bg-blue-600 
-                                     text-white font-bold rounded-r-lg"
+                              text-white font-bold rounded-r-lg"
                 >
                     Submit
                 </button>
@@ -70,19 +63,14 @@ const BorderHopperAutocomplete = ({ onSelect }) => {
 
             {isOpen && suggestions.length > 0 && (
                 <div className="absolute w-full mt-2 bg-white rounded-lg 
-                                     shadow-lg overflow-hidden z-50">
-                    {suggestions.map((country) => (
+                               shadow-lg overflow-hidden z-50">
+                    {suggestions.map((suggestion) => (
                         <button
-                            key={country}
-                            onClick={() => handleSelect(country)}
+                            key={suggestion}
+                            onClick={() => handleSelect(suggestion)}
                             className="w-full px-4 py-3 text-left hover:bg-gray-100"
                         >
-                            {getCommonName(country)}
-                            {getCommonName(country) !== country && (
-                                <span className="text-gray-500 text-sm ml-2">
-                                    ({country})
-                                </span>
-                            )}
+                            {suggestion}
                         </button>
                     ))}
                 </div>

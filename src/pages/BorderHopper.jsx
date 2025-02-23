@@ -1,11 +1,10 @@
 // src/pages/BorderHopper.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import useBorderHopperStore from '../store/borderHopperStore';
 import BorderHopperGlobe from '../components/borderHopper/border-globe';
 import BorderHopperAutocomplete from '../components/borderHopper/autocomplete';
 import PathDisplay from '../components/borderHopper/path-display';
-import WinModal from '../components/borderHopper/winModal';
-import ToastNotification from '../components/borderHopper/toastNotification';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 const BorderHopper = () => {
   const { 
@@ -15,11 +14,9 @@ const BorderHopper = () => {
     sourceCountry, 
     targetCountry,
     loading,
-    error
+    error,
+    getValidMoves
   } = useBorderHopperStore();
-
-  const [showWinModal, setShowWinModal] = useState(false);
-  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     initializeGame();
@@ -27,23 +24,10 @@ const BorderHopper = () => {
 
   const handleCountrySelect = (country) => {
     const result = makeMove(country);
-    
     if (!result.valid) {
-      setToast({
-        message: 'That country is not a neighbor!',
-        isError: true
-      });
-      return;
+      // Could use a toast notification here
+      alert(result.message);
     }
-
-    if (result.won) {
-      setShowWinModal(true);
-    }
-  };
-
-  const handlePlayAgain = () => {
-    setShowWinModal(false);
-    initializeGame();
   };
 
   if (loading) {
@@ -62,44 +46,36 @@ const BorderHopper = () => {
     );
   }
 
+  const currentCountry = currentPath[currentPath.length - 1];
+
   return (
     <div className="min-h-screen bg-[#eef6ff]">
       <div className="container mx-auto px-4 py-6">
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h1 className="text-2xl font-bold mb-4">Border Hopper</h1>
-          <p className="text-lg">
-            Travel from <span className="font-bold">{sourceCountry}</span> to{' '}
-            <span className="font-bold">{targetCountry}</span>
-          </p>
-        </div>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Border Hopper</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-lg mb-4">
+              Travel from <span className="font-bold">{sourceCountry}</span> to{' '}
+              <span className="font-bold">{targetCountry}</span>
+            </p>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <BorderHopperGlobe />
+            <BorderHopperGlobe selectedCountry={currentCountry} />
           </div>
           
           <div className="space-y-6">
             <BorderHopperAutocomplete 
               onSelect={handleCountrySelect}
+              suggestions={getValidMoves()}
             />
             <PathDisplay path={currentPath} />
           </div>
         </div>
-
-        {showWinModal && (
-          <WinModal 
-            path={currentPath}
-            onPlayAgain={handlePlayAgain}
-          />
-        )}
-
-        {toast && (
-          <ToastNotification
-            message={toast.message}
-            isError={toast.isError}
-            onClose={() => setToast(null)}
-          />
-        )}
       </div>
     </div>
   );
