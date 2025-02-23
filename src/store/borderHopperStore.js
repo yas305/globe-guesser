@@ -102,6 +102,7 @@ const useBorderHopperStore = create((set, get) => ({
     }
   },
 
+  
   makeMove: (country) => {
     const { currentPath, targetCountry, borders } = get();
     const currentCountry = currentPath[currentPath.length - 1];

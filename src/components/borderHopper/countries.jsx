@@ -11,13 +11,6 @@ const BorderCountries = () => {
     countryFeatures
   } = useBorderHopperStore();
 
-  // Debug log to see countryFeatures structure
-  console.log('countryFeatures structure:', {
-    featureCount: countryFeatures?.length,
-    firstFeature: countryFeatures?.[0],
-    lookingFor: { source: sourceCountry, target: targetCountry },
-  });
-
   if (!countryFeatures || countryFeatures.length === 0) {
     console.log('No country features available');
     return null;
@@ -30,28 +23,23 @@ const BorderCountries = () => {
     ...currentPath
   ]);
 
-  console.log('Attempting to render:', Array.from(countriesToShow));
-
   return (
     <>
       {Array.from(countriesToShow).map(countryName => {
-        // Try different property paths to find the country name
-        const feature = countryFeatures.find(f => 
-          f.name === countryName ||
-          f.properties?.name === countryName ||
-          f.properties?.ADMIN === countryName ||
-          f.properties?.NAME === countryName
-        );
+        const feature = countryFeatures.find(f => f.name === countryName);
         
-        if (!feature) {
-          console.log(`Could not find geometry for "${countryName}" in:`, 
-            countryFeatures.slice(0, 3).map(f => ({
-              name: f.name,
-              properties: f.properties
-            }))
-          );
+        if (!feature || !feature.geo_shape || !feature.geo_shape.geometry) {
+          console.log(`Could not find geometry for: ${countryName}`);
           return null;
         }
+
+        // Pass geometry data in same format as classic mode
+        const geometryData = {
+          geometry: {
+            type: feature.geo_shape.geometry.type,
+            coordinates: feature.geo_shape.geometry.coordinates
+          }
+        };
 
         const color = countryName === sourceCountry ? "#FFA500" :  // Orange for source
                      countryName === targetCountry ? "#FF0000" :   // Red for target
@@ -61,8 +49,9 @@ const BorderCountries = () => {
         return (
           <CountryGeometry
             key={countryName}
-            countryData={feature}
+            countryData={geometryData}
             color={color}
+            opacity={1}
           />
         );
       })}
