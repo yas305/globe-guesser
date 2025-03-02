@@ -1,9 +1,11 @@
 // src/pages/BorderHopper.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import useBorderHopperStore from '../store/borderHopperStore';
 import BorderHopperGlobe from '../components/borderHopper/border-globe';
 import BorderHopperAutocomplete from '../components/borderHopper/autocomplete';
 import PathDisplay from '../components/borderHopper/path-display';
+import WinModal from '../components/borderHopper/winModal';
+import ToastNotification from '../components/borderHopper/toastNotification';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 const BorderHopper = () => {
@@ -14,9 +16,11 @@ const BorderHopper = () => {
     sourceCountry, 
     targetCountry,
     loading,
-    error,
-    getValidMoves
+    error
   } = useBorderHopperStore();
+
+  const [showWinModal, setShowWinModal] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     initializeGame();
@@ -24,10 +28,23 @@ const BorderHopper = () => {
 
   const handleCountrySelect = (country) => {
     const result = makeMove(country);
+    
     if (!result.valid) {
-      // Could use a toast notification here
-      alert(result.message);
+      setToast({
+        message: 'That country is not a neighbor!',
+        isError: true
+      });
+      return;
     }
+
+    if (result.won) {
+      setShowWinModal(true);
+    }
+  };
+
+  const handlePlayAgain = () => {
+    setShowWinModal(false);
+    initializeGame();
   };
 
   if (loading) {
@@ -71,11 +88,25 @@ const BorderHopper = () => {
           <div className="space-y-6">
             <BorderHopperAutocomplete 
               onSelect={handleCountrySelect}
-              suggestions={getValidMoves()}
             />
             <PathDisplay path={currentPath} />
           </div>
         </div>
+
+        {showWinModal && (
+          <WinModal 
+            path={currentPath}
+            onPlayAgain={handlePlayAgain}
+          />
+        )}
+
+        {toast && (
+          <ToastNotification
+            message={toast.message}
+            isError={toast.isError}
+            onClose={() => setToast(null)}
+          />
+        )}
       </div>
     </div>
   );

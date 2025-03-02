@@ -9,7 +9,7 @@ export const countries = [
         "France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Greenland","Guatemala","Guinea",
         "Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq",
         "Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kosovo","Kuwait","Kyrgyzstan",
-        "Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Lithuania","Luxembourg","Macedonia","Madagascar",
+        "Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Lithuania","Luxembourg","North Macedonia","Madagascar",
         "Malawi","Malaysia","Mali","Mauritania","Mexico","Moldova","Mongolia","Montenegro","Morocco","Mozambique",
         "Myanmar","N. Cyprus","Namibia","Nepal","Netherlands","New Caledonia","New Zealand","Nicaragua","Niger",
         "Nigeria","North Korea","Norway","Oman","Pakistan","Palestine","Panama","Papua New Guinea","Paraguay",

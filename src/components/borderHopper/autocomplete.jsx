@@ -1,13 +1,11 @@
-// src/components/borderHopper/autocomplete.jsx
 import React, { useState, useRef, useEffect } from 'react';
-import useBorderHopperStore from '../../store/borderHopperStore';
+import { countries } from '../../data/countries'; // Import from your countries data
 
 const BorderHopperAutocomplete = ({ onSelect }) => {
     const [input, setInput] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef(null);
-    const validMoves = useBorderHopperStore(state => state.getValidMoves());
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -24,11 +22,16 @@ const BorderHopperAutocomplete = ({ onSelect }) => {
         setInput(value);
         
         if (value.length > 0) {
-            const filtered = validMoves.filter(country => 
-                country.toLowerCase().includes(value.toLowerCase())
-            );
+            // Filter ALL countries based on user input, not just valid moves
+            const filtered = countries
+                .filter(country => 
+                    typeof country === 'string' && 
+                    country.toLowerCase().includes(value.toLowerCase())
+                )
+                .slice(0, 5); // Limit to 5 suggestions for better UX
+            
             setSuggestions(filtered);
-            setIsOpen(true);
+            setIsOpen(filtered.length > 0);
         } else {
             setSuggestions([]);
             setIsOpen(false);
@@ -42,6 +45,12 @@ const BorderHopperAutocomplete = ({ onSelect }) => {
         setIsOpen(false);
     };
 
+    const handleSubmit = () => {
+        if (input.trim()) {
+            handleSelect(input);
+        }
+    };
+
     return (
         <div ref={wrapperRef} className="w-full max-w-md mx-auto relative z-50">
             <div className="flex bg-white rounded-lg shadow-lg">
@@ -51,9 +60,14 @@ const BorderHopperAutocomplete = ({ onSelect }) => {
                     onChange={handleChange}
                     placeholder="Enter your guess..."
                     className="w-full px-4 py-3 rounded-l-lg border-0 outline-none"
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSubmit();
+                        }
+                    }}
                 />
                 <button 
-                    onClick={() => handleSelect(input)}
+                    onClick={handleSubmit}
                     className="px-6 py-3 bg-blue-500 hover:bg-blue-600 
                               text-white font-bold rounded-r-lg"
                 >

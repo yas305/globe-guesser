@@ -30,14 +30,16 @@ const generateGamePair = (borders) => {
   const countries = Object.keys(borders);
   
   for (let attempts = 0; attempts < 100; attempts++) {
-    const source = countries[Math.floor(Math.random() * countries.length)];
-    const target = countries[Math.floor(Math.random() * countries.length)];
-    
+    // const source = countries[Math.floor(Math.random() * countries.length)];
+    // const target = countries[Math.floor(Math.random() * countries.length)];
+    const source = "Afghanistan";
+    const target = "Turkey";
     if (source === target) continue;
     
     const path = findPath(source, target, borders);
     if (path && path.length >= 2 && path.length <= 5) {
       return { source, target, path };
+      // return { "Albania":string, "Turkey":string, path };
     }
   }
   
@@ -74,7 +76,6 @@ const useBorderHopperStore = create((set, get) => ({
         throw new Error('Could not generate a valid country pair');
       }
 
-      console.log('Generated game pair:', gamePair);
       
       set({
         borders,
