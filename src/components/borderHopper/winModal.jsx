@@ -8,12 +8,12 @@ const WinModal = ({ path, onPlayAgain }) => {
         <h2 className="text-2xl font-bold text-center mb-4">
           Congratulations! 🎉
         </h2>
-        
+
         <div className="mb-6">
           <p className="text-center text-gray-600 mb-4">
             You found a path in {path.length - 1} moves!
           </p>
-          
+
           <div className="bg-gray-50 rounded-lg p-4">
             <h3 className="font-semibold mb-2">Your Path:</h3>
             <div className="flex flex-wrap gap-2">
